@@ -1,0 +1,137 @@
+from datetime import date
+from itertools import cycle
+
+depa_pisos = 10
+depa_por_pisos = 5
+depa_vendidos = []
+compradores = []
+
+def mirar_menu():
+  print("***************  MENU  ***************")
+  print("1. Comprar departamento")
+  print("2. Mostrar departamentos disponibles")
+  print("3. Ver listado de compradores")
+  print("4. Mostrar ganancias totales")
+  print("5. Salir del sistema")
+  print("**************************************\n")
+
+def digito_verificador(rut):
+  reversed_digits = map(int, reversed(str(rut)))
+  factors = cycle(range(2, 8))
+  s = sum(d * f for d, f in zip(reversed_digits, factors))
+  return (-s) % 11
+
+validacion = digito_verificador
+
+def compra_departamento():
+
+  rut = input("Por favor ingrese su RUT: ")
+  if validacion:
+    print("Se ha registrado correctamente.")
+  else:
+    print("Datos incorrectos")
+
+  print("Departamentos disponible:")
+  print("Piso\tTipo\tEstado")
+  for piso in range(1, depa_pisos + 1):
+      for letra in ['A', 'B', 'C', 'D']:
+          departamento = letra + str(piso)
+          if departamento in depa_vendidos:
+              estado = "Se encuentra comprado"
+          else:
+              estado = "Se encuentra disponible"
+          print(f"{piso}\t{departamento}\t{estado}")
+
+  departamento = input("Por favor ingrese el departamento que desea comprar: ")
+  if departamento in depa_vendidos:
+      print("El departamento seleccionado no se encuentra disponible.")
+  else:
+    tipo_departamento = departamento[0]
+    if departamento[1:].isdigit():
+        piso = int(departamento[1:])
+        if 1 <= piso <= depa_pisos and tipo_departamento in ['A', 'B', 'C', 'D']:
+            if tipo_departamento == 'A':
+                precio_venta = 3800
+            elif tipo_departamento == 'B':
+                precio_venta = 3000
+            elif tipo_departamento == 'C':
+                precio_venta = 2800
+            elif tipo_departamento == 'D':
+                precio_venta = 3500
+
+            op = input("Por davor ingresar 'C' para comprar: ")
+            if op == 'C':
+                depa_vendidos.append(departamento)
+                compradores.append((f"{rut}-{digito_verificador(rut)}", departamento, "Comprado"))
+                print("La operacion se ha realizado correctamente.")
+            else:
+                print("Opcion invalida.")
+        else:
+            print("El departamento seleccionado no existe.")
+    else:
+        print("Departamento invalido")
+
+def mostrar_departamentos():
+  print("Lista de departamentos disponibles:")
+  print("Piso\tTipo\tEstado")
+  for piso in range(1, depa_pisos + 1):
+      for letra in ['A', 'B', 'C', 'D']:
+          departamento = letra + str(piso)
+          if departamento in depa_vendidos:
+              estado = "Se encuentra comprado"
+          else:
+              estado = "Se encuentra disponible"
+          print(f"{piso}\t{departamento}\t{estado}")
+
+def ver_compradores():
+  if len(compradores) == 0:
+      print("No hay compradores registrados.")
+  else:
+      compradores_ordenados = sorted(compradores, key=lambda x: x[0])
+      print("RUN\t\tDepartamento\tTipo")
+      for comprador in compradores_ordenados:
+          print(f"{comprador[0]}\t{comprador[1]}\t\t{comprador[2]}")
+
+
+def mostrar_ganancias():
+  precio = {
+      'A': {'ventas': 3800},
+      'B': {'ventas': 3000},
+      'C': {'ventas': 2800},
+      'D': {'ventas': 3500},
+  }
+
+  v_total = {}
+  for departamento in depa_vendidos:
+      tipo = departamento[0]
+      if tipo not in v_total:
+          v_total[tipo] = 1
+      else:
+          v_total[tipo] += 1
+
+  print("Tipo de departamento\tCantidad\tTotal")
+  for tipo, cantidad in v_total.items():
+    precio_venta = precio[tipo]['ventas']
+    total = precio_venta * cantidad
+    print(f"{tipo}\t\t\t\t{cantidad}\t{total}UF")
+
+def menu():
+  print("\tBienvenidos a inmobiliarias “Casa Feliz”\n\t ¡Compra el apartamento de tus sueños!\n")
+  while True:
+    mirar_menu()
+    opcion = input("Por favor seleccione una opcion: ")
+    if opcion == "1":
+      compra_departamento()
+    elif opcion == "2":
+      mostrar_departamentos()
+    elif opcion == "3":
+      ver_compradores()
+    elif opcion == "4":
+      mostrar_ganancias()
+    elif opcion == '5':
+        print("\nGracias por utilizar el sistema “Casa Feliz”.")
+        print("Nombre: Leonardo Guerra Perez\tFecha: " + str(date.today()))
+        break
+    else:
+        print("Opcion invalida. Intentar nuevamente.")
+menu()
